@@ -1,0 +1,8 @@
+{
+  "name": "nayami-shindan",
+  "version": "1.0.0",
+  "description": "お金グセ診断アプリ",
+  "scripts": {
+    "dev": "vercel dev"
+  }
+}
