@@ -1018,22 +1018,26 @@ async function finalize(){
   // AIには「理論別の回答ログ」だけを渡す。占術は一切渡さない。
   const ansLog = answers.map(a=>`[${a.theory}／${a.cat}]「${a.q}」→「${a.a}」`).join('\n');
 
-  const systemPrompt = `あなたは行動経済学に精通した診断士です。JSONのみ返してください。前置き不要。コードブロック禁止。`;
+  const systemPrompt = 'あなたは行動経済学に精通した診断士です。JSONのみ返してください。前置き不要。コードブロック禁止。';
 
-  const userPrompt = `${profile.name}さんの診断データ:
-タイプ:${td.name}
+  const outputFormat = '{"desc":"診断文","hook":"フックコピー","secret":"誰にも話していない悩み（1〜2文）","evidence":"診断根拠（1行）","contradictions":[{"point":"矛盾の指摘","term":"心理学用語","termDesc":"中学生向け説明"},{"point":"矛盾の指摘2","term":"心理学用語","termDesc":"説明"}]}';
 
-回答:
-${ansLog}
-
-出力形式（このJSONのみ）:
-{"desc":"診断文","hook":"フックコピー（1文）","secret":"まだ誰にも話していないであろうお金の悩みや本音（1〜2文）","evidence":"なぜこの診断になったかの根拠（1行）","contradictions":[{"point":"矛盾の指摘文","term":"心理学用語名","termDesc":"中学生でもわかる1文説明"},{"point":"矛盾の指摘文2","term":"心理学用語名","termDesc":"説明"}]}
-
-descルール:回答の言葉を使わない/心理の根っこを言い当てる/2〜3文/「でも、それは変えられます。」で締める/占い表現禁止
-contradictionsルール:具体的な回答内容を使う/誰にでも当てはまる指摘禁止
-hookルール:「〜のとき、〜してしまいませんか？」形式/この人固有のグセを刺す
-secretルール:「〜ではないでしょうか」で柔らかく/具体的な感情・状況
-evidenceルール:「〇〇と△△の組み合わせから〜と判断」形式`;
+  const userPrompt = [
+    profile.name + 'さんの診断データ:',
+    'タイプ:' + td.name,
+    '',
+    '回答:',
+    ansLog,
+    '',
+    '出力形式（このJSONのみ）:',
+    outputFormat,
+    '',
+    'descルール:回答の言葉を使わない/心理の根っこを言い当てる/2〜3文/「でも、それは変えられます。」で締める',
+    'contradictionsルール:具体的な回答内容を使う/誰にでも当てはまる指摘禁止',
+    'hookルール:「〜のとき、〜してしまいませんか？」形式',
+    'secretルール:「〜ではないでしょうか」で柔らかく',
+    'evidenceルール:「〇〇と△△の組み合わせから〜と判断」形式'
+  ].join('\n');
 
   try{
     const safeBody = JSON.stringify({
