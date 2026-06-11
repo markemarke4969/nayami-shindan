@@ -973,13 +973,17 @@ async function finalize(){
   // 占術はスコア調整のみ（診断文には渡さない）
   const fs={...qScores};
   const add=(w,m)=>Object.entries(w||{}).forEach(([k,v])=>{ fs[k]=(fs[k]||0)+Math.round(v*m); });
-  const safeBirthScore = profile.birth.replace(/\//g,'-').replace(/[^0-9-]/g,'');
-  try{ add(getZodiac(safeBirthScore), 1.5); }catch(e){}
-  try{ add(getEto(safeBirthScore),    0.5); }catch(e){}
-  try{ add(getGokyo(safeBirthScore),  0.5); }catch(e){}
-  try{ add(getKyusei(safeBirthScore), 0.5); }catch(e){}
-  try{ add(LP_W[calcLP(safeBirthScore)], 0.5); }catch(e){}
-  try{ add(BT_W[profile.blood],      0.8); }catch(e){}
+  try{
+    const sb = (profile.birth||'').replace(/[/]/g,'-').replace(/[^0-9-]/g,'');
+    if(sb.length >= 8){
+      try{ add(getZodiac(sb), 1.5); }catch(e){}
+      try{ add(getEto(sb),    0.5); }catch(e){}
+      try{ add(getGokyo(sb),  0.5); }catch(e){}
+      try{ add(getKyusei(sb), 0.5); }catch(e){}
+      try{ add(LP_W[calcLP(sb)], 0.5); }catch(e){}
+    }
+    try{ add(BT_W[profile.blood], 0.8); }catch(e){}
+  }catch(e){}
 
   const topType=TYPE_KEYS.reduce((a,b)=>fs[a]>=fs[b]?a:b);
   const td=TYPES[topType];
@@ -1002,14 +1006,24 @@ async function finalize(){
 
   // 占術から「生まれ持った特性」を生成（表示用）
   // 生年月日を安全にパース（テキスト入力対応）
-  const safeBirth = profile.birth.replace(/\//g,'-').replace(/[^0-9-]/g,'');
-  let zodiacData, etoData, gokyoData, kyuseiData, lpData, btData;
-  try{ zodiacData = getZodiacFull(safeBirth); }catch(e){ zodiacData={icon:'✨',name:'不明',moneyTrait:''}; }
-  try{ etoData    = getEtoFull(safeBirth);    }catch(e){ etoData   ={icon:'✨',name:'不明',moneyTrait:''}; }
-  try{ gokyoData  = getGokyoFull(safeBirth);  }catch(e){ gokyoData ={icon:'✨',name:'不明',moneyTrait:''}; }
-  try{ kyuseiData = getKyuseiFull(safeBirth); }catch(e){ kyuseiData={icon:'✨',name:'不明',moneyTrait:''}; }
-  try{ lpData     = getLPFull(safeBirth);     }catch(e){ lpData    ={icon:'✨',num:1,moneyTrait:''}; }
-  try{ btData     = getBTFull(profile.blood); }catch(e){ btData    ={icon:'✨',moneyTrait:''}; }
+  const defaultOccult = {icon:'✨', name:'不明', moneyTrait:'', num:1};
+  let zodiacData = {...defaultOccult};
+  let etoData    = {...defaultOccult};
+  let gokyoData  = {...defaultOccult};
+  let kyuseiData = {...defaultOccult};
+  let lpData     = {...defaultOccult};
+  let btData     = {...defaultOccult};
+  try{
+    const safeBirth = (profile.birth||'').replace(/[/]/g,'-').replace(/[^0-9-]/g,'');
+    if(safeBirth.length >= 8){
+      zodiacData = getZodiacFull(safeBirth) || zodiacData;
+      etoData    = getEtoFull(safeBirth)    || etoData;
+      gokyoData  = getGokyoFull(safeBirth)  || gokyoData;
+      kyuseiData = getKyuseiFull(safeBirth) || kyuseiData;
+      lpData     = getLPFull(safeBirth)     || lpData;
+    }
+    btData = getBTFull(profile.blood) || btData;
+  }catch(e){ console.error('occult error:', e); }
 
   const innateTraits = [
     { icon: zodiacData.icon, label: zodiacData.name, source: '星座', desc: zodiacData.moneyTrait },
