@@ -1173,7 +1173,7 @@ async function finalize(){
     } else {
       const raw=json.content[0].text.trim();
       const cleaned=raw.replace(/```json\s*/g,'').replace(/```\s*/g,'').trim();
-      const m=cleaned.match(/\{[\s\S]*\}/);
+      const firstBrace=cleaned.indexOf('{'); const lastBrace=cleaned.lastIndexOf('}'); const m=firstBrace>=0&&lastBrace>firstBrace?[cleaned.slice(firstBrace,lastBrace+1)]:null;
       if(m){
         try{
           const parsed=JSON.parse(m[0]);
@@ -1186,7 +1186,13 @@ async function finalize(){
           window.R={type:topType, desc:`JSON解析エラー。生レスポンス: ${raw.slice(0,300)}`, hook:'', contradictions:[], scores:savedScores, axes:savedAxes, innate:innateTraits};
         }
       } else {
-        window.R={type:topType, desc:raw, hook:'', contradictions:[], scores:savedScores, axes:savedAxes, innate:innateTraits};
+        try {
+          const parsed2 = JSON.parse(raw);
+          const contradictions2=(parsed2.contradictions||[]).map(cx=>typeof cx==='string'?{point:cx,term:'',termDesc:''}:cx);
+          window.R={type:topType, desc:parsed2.desc||'', hook:parsed2.hook||'', secret:parsed2.secret||'', evidence:parsed2.evidence||'', blind_spot:parsed2.blind_spot||'', strengths_weaknesses:parsed2.strengths_weaknesses||'', money_scene:parsed2.money_scene||'', contradictions:contradictions2, scores:savedScores, axes:savedAxes, innate:innateTraits};
+        } catch(e2) {
+          window.R={type:topType, desc:'もう一度お試しください。', hook:'', secret:'', evidence:'', blind_spot:'', strengths_weaknesses:'', money_scene:'', contradictions:[], scores:savedScores, axes:savedAxes, innate:innateTraits};
+        }
       }
     }
   } catch(e){
