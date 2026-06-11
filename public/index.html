@@ -328,6 +328,12 @@ body{
 .evidence-row{display:flex;align-items:flex-start;gap:6px;font-size:11px;color:var(--muted);margin-bottom:1rem;padding:.5rem .75rem;background:rgba(255,255,255,0.04);border-radius:8px;line-height:1.6;border:1px solid rgba(180,140,255,0.1);}
 .evidence-icon{flex-shrink:0;}
 .evidence-text{line-height:1.65;}
+.sw-box{background:rgba(90,138,106,0.08);border:1px solid rgba(90,138,106,0.25);border-radius:14px;padding:1.1rem 1.25rem;margin-bottom:1rem;}
+.sw-label{font-size:11px;color:rgba(120,200,150,0.9);letter-spacing:1px;margin-bottom:.5rem;}
+.sw-text{font-size:14px;line-height:1.85;color:rgba(200,240,210,0.9);}
+.ms-box{background:rgba(212,168,75,0.07);border:1px solid rgba(212,168,75,0.25);border-radius:14px;padding:1.1rem 1.25rem;margin-bottom:1rem;}
+.ms-label{font-size:11px;color:rgba(212,168,75,0.9);letter-spacing:1px;margin-bottom:.5rem;}
+.ms-text{font-family:'Shippori Mincho',serif;font-size:15px;line-height:1.95;color:rgba(255,230,150,0.9);}
 .blind-spot-box{background:rgba(255,80,80,0.07);border:1px solid rgba(255,100,100,0.25);border-radius:14px;padding:1.1rem 1.25rem;margin-bottom:1.25rem;}
 .blind-spot-label{font-size:11px;color:rgba(255,150,150,0.9);letter-spacing:1px;margin-bottom:.5rem;}
 .blind-spot-text{font-family:'Shippori Mincho',serif;font-size:15px;line-height:1.95;color:rgba(255,200,200,0.9);}
@@ -390,12 +396,54 @@ async function sbFetch(path, method="GET", body=null) {
 }
 
 const TYPES = {
-  hinata:   { name:"ひだまりお昼寝タイプ",  tagline:"今が心地よすぎて、未来がぼやけている",         symbol:"🌤️", traits:["現状維持バイアス強め","損失回避型","変化より安定","先送り癖"],       advice:"必要なのは「大きなリスク」じゃなく「小さな動き出し」。自動化できる仕組みを持つことで、今の心地よさを壊さずに未来を作れます。" },
-  dance:    { name:"雨上がりのダンスタイプ", tagline:"熱量は本物、でも続かないのがわかってる",       symbol:"🌈", traits:["衝動的な意思決定","現在バイアス強め","熱しやすく冷めやすい","仕組みが必要"], advice:"直感は正しい。足りないのは「自分が動かなくても続く仕組み」。感情に左右されない自動化が、あなたの最大の武器になります。" },
-  chizu:    { name:"深夜の地図帳タイプ",     tagline:"情報はある、でも出発できない",                 symbol:"🗺️", traits:["過剰な情報収集","完璧主義的意思決定","損失回避×先延ばし","分析麻痺"],   advice:"知識はもう十分。あとは「完璧じゃなくても動ける仕組み」だけ。自動で動いてくれるものを選ぶのが、このタイプに一番合っています。" },
-  madogawa: { name:"窓際のコーヒータイプ",   tagline:"横目で見ながら、自分のタイミングを待っている", symbol:"☕",  traits:["社会的比較で動く","機会損失への恐れ","他者基準の意思決定","焦りと停滞"],   advice:"「羨ましい」と感じる感覚は、変わりたい意思の証拠。その気持ちを小さな一手につなげるだけでいい。" },
-  bbq:      { name:"満月ひとりBBQタイプ",    tagline:"全部自分でやろうとして、全部中途半端になる",   symbol:"🌕", traits:["高い自己効力感×過負荷","他者依存への抵抗","コントロール幻想","完璧主義"],   advice:"全部自分でやろうとするのは誠実さの表れ。でも「信頼できる仕組みに任せる」選択が、時間と精神力を一番効率的に使う方法です。" },
-  jihan:    { name:"夕暮れ自販機タイプ",     tagline:"ストレスとお金が直結している",                 symbol:"🌇", traits:["感情的意思決定","メンタルアカウンティング","現在バイアス","ストレス消費"], advice:"使うことでストレスが解消されるなら、今の生活に無理がある証拠。お金の流れを「感情から切り離す仕組み」を持つと、自然と余裕が生まれます。" }
+  hinata: {
+    name:"ひだまりお昼寝タイプ", tagline:"今が心地よすぎて、未来がぼやけている", symbol:"🌤️",
+    traits:["現状維持バイアス強め","損失回避型","変化より安定","先送り癖"],
+    advice:"必要なのは「大きなリスク」じゃなく「小さな動き出し」。自動化できる仕組みを持つことで、今の心地よさを壊さずに未来を作れます。",
+    strengths:["安定志向で慎重","大きな失敗をしない","継続力がある","リスクを取らないので着実"],
+    weaknesses:["変化が怖くて動けない","チャンスを逃す","「いつかやろう」が永遠に来ない","先送りが習慣化している"],
+    money_scene:"投資を「もう少し調べてから」と言い続けて5年経っている。口座にお金はあるが、ただ眠っているだけ。"
+  },
+  dance: {
+    name:"雨上がりのダンスタイプ", tagline:"熱量は本物、でも続かないのがわかってる", symbol:"🌈",
+    traits:["衝動的な意思決定","現在バイアス強め","熱しやすく冷めやすい","仕組みが必要"],
+    advice:"直感は正しい。足りないのは「自分が動かなくても続く仕組み」。感情に左右されない自動化が、あなたの最大の武器になります。",
+    strengths:["行動力がある","直感が鋭い","新しいことへの好奇心が強い","勢いで動ける"],
+    weaknesses:["熱しやすく冷めやすい","三歩目で止まる","仕組みがないと何も積み上がらない","衝動買いしやすい"],
+    money_scene:"貯金アプリを3つダウンロードしたが全部3週間で使わなくなった。副業も始めては辞めてを繰り返している。"
+  },
+  chizu: {
+    name:"深夜の地図帳タイプ", tagline:"情報はある、でも出発できない", symbol:"🗺️",
+    traits:["過剰な情報収集","完璧主義的意思決定","損失回避×先延ばし","分析麻痺"],
+    advice:"知識はもう十分。あとは「完璧じゃなくても動ける仕組み」だけ。自動で動いてくれるものを選ぶのが、このタイプに一番合っています。",
+    strengths:["知識が豊富","リスク管理が得意","慎重で失敗が少ない","分析力が高い"],
+    weaknesses:["完璧主義で行動できない","情報収集が目的になっている","「準備が整ってから」が永遠に来ない","分析麻痺に陥りやすい"],
+    money_scene:"投資の本を10冊読んで証券口座も開設したが、1円も買っていない。「もう少し勉強してから」が口癖。"
+  },
+  madogawa: {
+    name:"窓際のコーヒータイプ", tagline:"横目で見ながら、自分のタイミングを待っている", symbol:"☕",
+    traits:["社会的比較で動く","機会損失への恐れ","他者基準の意思決定","焦りと停滞"],
+    advice:"「羨ましい」と感じる感覚は、変わりたい意思の証拠。その気持ちを小さな一手につなげるだけでいい。",
+    strengths:["観察眼がある","冷静に状況を見極められる","焦って失敗しない"],
+    weaknesses:["他人と比べて焦るのに動けない","「自分のタイミング」が来ない","機会損失を恐れながら何もしない","SNSで落ち込む"],
+    money_scene:"「同期が家を買った」「友人が資産1000万達成」を見て焦るが、自分では何も変えられていない。羨ましいとわかっているのに動けない。"
+  },
+  bbq: {
+    name:"満月ひとりBBQタイプ", tagline:"全部自分でやろうとして、全部中途半端になる", symbol:"🌕",
+    traits:["高い自己効力感×過負荷","他者依存への抵抗","コントロール幻想","完璧主義"],
+    advice:"全部自分でやろうとするのは誠実さの表れ。でも「信頼できる仕組みに任せる」選択が、時間と精神力を一番効率的に使う方法です。",
+    strengths:["責任感が強い","自立心が高い","誠実","完遂しようとする意志がある"],
+    weaknesses:["人に頼れない","抱えすぎて消耗する","「自分でやった方が早い」と思い込む","仕組み化・自動化を避けてしまう"],
+    money_scene:"家計管理も投資も確定申告も全部自分でやろうとして、どれも中途半端。「人に任せるのが不安」で専門家にも相談しない。"
+  },
+  jihan: {
+    name:"黄昏自販機タイプ", tagline:"ストレスとお金が直結している", symbol:"🌇",
+    traits:["感情的意思決定","メンタルアカウンティング","現在バイアス","ストレス消費"],
+    advice:"使うことでストレスが解消されるなら、今の生活に無理がある証拠。お金の流れを「感情から切り離す仕組み」を持つと、自然と余裕が生まれます。",
+    strengths:["感情に正直","ストレス発散がうまい","今を楽しむ力がある","人への気遣いができる"],
+    weaknesses:["感情でお金を使いやすい","ストレスが出費に直結する","「ご褒美」が多すぎる","貯まらない理由はわかっているのに変えられない"],
+    money_scene:"残業続きの週は必ず無駄遣いが増える。コンビニやネットショッピングで気づいたら1万円消えている。「疲れたから仕方ない」が口癖。"
+  }
 };
 const TYPE_KEYS = Object.keys(TYPES);
 
@@ -841,6 +889,16 @@ function renderResult(app){
   ).join('');
 
   const hookHtml=window.R.hook?`<div class="hook-box"><div class="hook-text">${window.R.hook}</div></div>`:'';
+  const swHtml=window.R.strengths_weaknesses?`
+    <div class="sw-box">
+      <div class="sw-label">✦ あなたの長所と短所</div>
+      <div class="sw-text">${window.R.strengths_weaknesses}</div>
+    </div>`:'';
+  const msHtml=window.R.money_scene?`
+    <div class="ms-box">
+      <div class="ms-label">💴 あなたのお金グセの場面</div>
+      <div class="ms-text">${window.R.money_scene}</div>
+    </div>`:'';
   const blindSpotHtml=window.R.blind_spot?`
     <div class="blind-spot-box">
       <div class="blind-spot-label">⚠️ あなたの盲点</div>
@@ -875,6 +933,8 @@ function renderResult(app){
       <div class="result-desc">${window.R.desc||td.tagline}</div>
       ${evidenceHtml}
       ${hookHtml}
+      ${swHtml}
+      ${msHtml}
       ${blindSpotHtml}
       ${secretHtml}
       ${contHtml}
@@ -1053,25 +1113,47 @@ async function finalize(){
   // AIには「理論別の回答ログ」だけを渡す。占術は一切渡さない。
   const ansLog = answers.map((a,i)=>(i+1)+'. '+a.q+' => '+a.a).join('\n');
 
-  const systemPrompt = 'あなたは行動経済学に精通した診断士です。JSONのみ返してください。前置き不要。コードブロック禁止。';
+  const systemPrompt = 'あなたは行動経済学と占術に精通した診断士です。JSONのみ返してください。前置き不要。コードブロック禁止。';
 
-  const outputFormat = '{"desc":"診断文","hook":"フックコピー","secret":"誰にも話していない悩み（1〜2文）","evidence":"診断根拠（1行）","blind_spot":"お金に関する思い込みや盲点を1〜2文で正直に指摘","contradictions":[{"point":"矛盾の指摘","term":"心理学用語","termDesc":"中学生向け説明"},{"point":"矛盾の指摘2","term":"心理学用語","termDesc":"説明"}]}';
+  const occultContext = [
+    '星座の特性:' + (zodiacData.moneyTrait||''),
+    '干支の特性:' + (etoData.moneyTrait||''),
+    '五行の特性:' + (gokyoData.moneyTrait||''),
+    '九星の特性:' + (kyuseiData.moneyTrait||''),
+    '数秘の特性:' + (lpData.moneyTrait||''),
+    '血液型の特性:' + (btData.moneyTrait||''),
+  ].join('\n');
+
+  const typeContext = [
+    'タイプの長所:' + (td.strengths||[]).join('、'),
+    'タイプの短所:' + (td.weaknesses||[]).join('、'),
+    'お金グセの典型例:' + (td.money_scene||''),
+  ].join('\n');
+
+  const outputFormat = '{"desc":"診断文（2〜3文）","hook":"フックコピー（1文）","secret":"誰にも話していない悩み（1〜2文）","evidence":"診断根拠（1行）","blind_spot":"お金の思い込みや盲点（1〜2文）","strengths_weaknesses":"この人固有の長所と短所（占術とタイプの掛け合わせ、2〜3文）","money_scene":"この人のリアルなお金グセの場面（1〜2文）","contradictions":[{"point":"矛盾の指摘","term":"心理学用語","termDesc":"中学生向け説明"},{"point":"矛盾の指摘2","term":"心理学用語","termDesc":"説明"}]}';
 
   const userPrompt = [
-    profile.name + 'さんの診断データ:',
-    'タイプ:' + td.name,
+    profile.name + 'さんの診断:',
+    'タイプ:' + td.name + '(' + td.tagline + ')',
+    '',
+    '生まれ持った特性:',
+    occultContext,
+    '',
+    'タイプ特徴:',
+    typeContext,
     '',
     '回答:',
     ansLog,
     '',
-    '出力形式（このJSONのみ）:',
-    outputFormat,
-    '',
-    'descルール:回答の言葉を使わない/心理の根っこを言い当てる/この人の思い込みや盲点（お金に関する歪んだ信念）を正直に指摘する/2〜3文/「でも、それは変えられます。」で締める',
-    'contradictionsルール:具体的な回答内容を使う/誰にでも当てはまる指摘禁止',
-    'hookルール:「〜のとき、〜してしまいませんか？」形式',
-    'secretルール:「〜ではないでしょうか」で柔らかく',
-    'evidenceルール:「〇〇と△△の組み合わせから〜と判断」形式\nblind_spotルール:「〜という思い込みがあるかもしれません」形式/お金に関する歪んだ信念・無意識の偏見を正直に/優しく刺す'
+    '出力(' + outputFormat + ')',
+    'desc:回答と生まれ持った特性を踏まえて心理の根っこを言い当てる。星座干支名は使わず「生まれ持った性質」と表現。「でも、それは変えられます。」で締める',
+    'strengths_weaknesses:タイプ長所短所×生まれ持った特性を掛け合わせてこの人だけの表現に',
+    'money_scene:回答と生まれ持った特性から「この人が実際にやりそうな場面」を具体的に',
+    'contradictions:具体的な回答内容を使う。誰にでも当てはまる指摘禁止',
+    'blind_spot:お金に関する歪んだ信念を正直に指摘',
+    'hook:「〜のとき、〜してしまいませんか？」形式',
+    'secret:「〜ではないでしょうか」で柔らかく',
+    'evidence:「〇〇と△△の組み合わせから〜と判断」形式'
   ].join('\n');
 
   try{
@@ -1099,7 +1181,7 @@ async function finalize(){
           const contradictions=(parsed.contradictions||[]).map(c=>
             typeof c==='string' ? {point:c,term:'',termDesc:''} : c
           );
-          window.R={type:topType, desc:parsed.desc||'（descが空です）', hook:parsed.hook||'', secret:parsed.secret||'', evidence:parsed.evidence||'', blind_spot:parsed.blind_spot||'', contradictions, scores:savedScores, axes:savedAxes, innate:innateTraits};
+          window.R={type:topType, desc:parsed.desc||'（descが空です）', hook:parsed.hook||'', secret:parsed.secret||'', evidence:parsed.evidence||'', blind_spot:parsed.blind_spot||'', strengths_weaknesses:parsed.strengths_weaknesses||'', money_scene:parsed.money_scene||'', contradictions, scores:savedScores, axes:savedAxes, innate:innateTraits};
         } catch(parseErr){
           window.R={type:topType, desc:`JSON解析エラー。生レスポンス: ${raw.slice(0,300)}`, hook:'', contradictions:[], scores:savedScores, axes:savedAxes, innate:innateTraits};
         }
