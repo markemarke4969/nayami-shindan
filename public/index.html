@@ -896,7 +896,9 @@ function renderResult(app){
 // ============================================================
 function startDiagnosis(){
   profile.name=document.getElementById('nameInput')?.value?.trim()||profile.name;
-  profile.birth=document.getElementById('birthInput')?.value?.trim()||profile.birth;
+  const rawBirth = document.getElementById('birthInput')?.value?.trim()||'';
+  // Safari: 1990/06/11 → 1990-06-11 に正規化
+  profile.birth = rawBirth.replace(/\//g, '-') || profile.birth;
   const err=document.getElementById('start-err');
   if(!profile.name){err.innerHTML='<div class="err-msg">お名前を入力してください</div>';return;}
   if(!profile.birth){err.innerHTML='<div class="err-msg">生年月日を入力してください</div>';return;}
