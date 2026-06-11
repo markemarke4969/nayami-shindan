@@ -1016,7 +1016,7 @@ async function finalize(){
   ];
 
   // AIには「理論別の回答ログ」だけを渡す。占術は一切渡さない。
-  const ansLog = answers.map(a=>`[${a.theory}／${a.cat}]「${a.q}」→「${a.a}」`).join('\n');
+  const ansLog = answers.map((a,i)=>(i+1)+'. '+a.q+' => '+a.a).join('\n');
 
   const systemPrompt = 'あなたは行動経済学に精通した診断士です。JSONのみ返してください。前置き不要。コードブロック禁止。';
 
@@ -1075,14 +1075,33 @@ async function finalize(){
   } catch(e){
     window.R={type:topType, desc:`通信エラー: ${e.message}`, hook:'', contradictions:[], scores:savedScores, axes:savedAxes, innate:innateTraits};
   }
-  // 診断ログをSupabaseに保存
+  // 顧客データをサーバー経由でSupabaseに保存
   try{
-    await sbFetch('/rest/v1/diagnosis_log', 'POST', {
-      type_key: topType,
-      scores_json: savedScores,
-      axes_json: savedAxes
+    await fetch('/api/save-response', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        name: profile.name,
+        birth_date: profile.birth,
+        blood_type: profile.blood,
+        type_key: topType,
+        answers: answers,
+        scores: savedScores,
+        axes: savedAxes,
+        ai_desc: window.R?.desc || ''
+      })
     });
-  }catch(e){ console.error('diagnosis log error:', e); }
+  }catch(e){ console.error('save response error:', e); }
+
+  // 外れが10件溜まるたびに自動学習を実行
+  try{
+    const statsRes = await sbFetch('/rest/v1/feedback_stats?select=miss_count');
+    const totalMiss = (statsRes||[]).reduce((sum, r) => sum + (r.miss_count||0), 0);
+    if(totalMiss > 0 && totalMiss % 10 === 0){
+      fetch('/api/auto-learn', {method:'POST', headers:{'Content-Type':'application/json'}, body:'{}'})
+        .catch(e => console.log('auto-learn:', e));
+    }
+  }catch(e){}
 
   // 最低3秒のローディングを保証
   const elapsed = Date.now() - window._loadStart;
