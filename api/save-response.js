@@ -1,5 +1,5 @@
 // api/save-response.js
-// 顧客の回答データをSupabaseに保存
+const https = require('https');
 
 module.exports = async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -10,37 +10,47 @@ module.exports = async function handler(req, res) {
 
   const { name, birth_date, blood_type, type_key, answers, scores, axes, ai_desc } = req.body;
 
-  try {
-    const response = await fetch(
-      `${process.env.SUPABASE_URL}/rest/v1/user_responses`,
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'apikey': process.env.SUPABASE_ANON_KEY,
-          'Authorization': `Bearer ${process.env.SUPABASE_ANON_KEY}`,
-          'Prefer': 'return=minimal',
-        },
-        body: JSON.stringify({
-          name,
-          birth_date,
-          blood_type,
-          type_key,
-          answers_json: answers,
-          scores_json: scores,
-          axes_json: axes,
-          ai_desc,
-        }),
-      }
-    );
+  const supabaseUrl = new URL(process.env.SUPABASE_URL);
+  const body = JSON.stringify({
+    name,
+    birth_date: birth_date || null,
+    blood_type,
+    type_key,
+    answers_json: answers,
+    scores_json: scores,
+    axes_json: axes,
+    ai_desc: ai_desc || '',
+  });
 
-    if (!response.ok) {
-      const err = await response.text();
-      return res.status(response.status).json({ error: err });
-    }
+  return new Promise((resolve) => {
+    const options = {
+      hostname: supabaseUrl.hostname,
+      path: '/rest/v1/user_responses',
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Content-Length': Buffer.byteLength(body),
+        'apikey': process.env.SUPABASE_ANON_KEY,
+        'Authorization': `Bearer ${process.env.SUPABASE_ANON_KEY}`,
+        'Prefer': 'return=minimal',
+      },
+    };
 
-    return res.status(200).json({ success: true });
-  } catch (error) {
-    return res.status(500).json({ error: error.message });
-  }
+    const req2 = https.request(options, (res2) => {
+      let data = '';
+      res2.on('data', chunk => data += chunk);
+      res2.on('end', () => {
+        res.status(200).json({ success: true });
+        resolve();
+      });
+    });
+
+    req2.on('error', (e) => {
+      res.status(500).json({ error: e.message });
+      resolve();
+    });
+
+    req2.write(body);
+    req2.end();
+  });
 };
