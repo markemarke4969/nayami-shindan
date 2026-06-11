@@ -760,7 +760,7 @@ function renderStart(app){
     <div id="start-err"></div>
   </div>`;
   document.getElementById('nameInput').addEventListener('input',e=>profile.name=e.target.value.trim());
-  document.getElementById('birthInput').addEventListener('change',e=>profile.birth=e.target.value);
+  const bi=document.getElementById('birthInput'); bi.addEventListener('change',e=>profile.birth=e.target.value); bi.addEventListener('input',e=>profile.birth=e.target.value);
 }
 
 function selectBlood(t){
@@ -896,7 +896,7 @@ function renderResult(app){
 // ============================================================
 function startDiagnosis(){
   profile.name=document.getElementById('nameInput')?.value?.trim()||profile.name;
-  profile.birth=document.getElementById('birthInput')?.value||profile.birth;
+  profile.birth=document.getElementById('birthInput')?.value?.trim()||profile.birth;
   const err=document.getElementById('start-err');
   if(!profile.name){err.innerHTML='<div class="err-msg">お名前を入力してください</div>';return;}
   if(!profile.birth){err.innerHTML='<div class="err-msg">生年月日を入力してください</div>';return;}
@@ -1016,7 +1016,7 @@ async function finalize(){
   ];
 
   // AIには「理論別の回答ログ」だけを渡す。占術は一切渡さない。
-  const ansLog = answers.map(a=>`[${a.theory}／${a.cat}]「${a.q}」→「${a.a}」`).join('\n');
+  const ansLog = answers.map((a,i)=>(i+1)+'. '+a.q+' => '+a.a).join('\n');
 
   const systemPrompt = 'あなたは行動経済学に精通した診断士です。JSONのみ返してください。前置き不要。コードブロック禁止。';
 
