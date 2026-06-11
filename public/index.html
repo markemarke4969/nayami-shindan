@@ -1146,7 +1146,7 @@ async function loadFeedbackStats(typeKey){
     el.innerHTML=`この診断結果を見た <strong>${total.toLocaleString()}</strong> 人中、<strong>${hit.toLocaleString()}</strong> 人（<strong>${pct}%</strong>）が「当たっている」と回答しています。`;
   }catch(e){
     const pct=Math.round((FB_BASE.hit/FB_BASE.total)*100);
-    el.innerHTML=`この診断結果を見た <strong>${FB_BASE.total}</strong> 人中、<strong>${FB_BASE.hit}</strong> 人（<strong>${pct}%</strong>）が「当たっている」と回答しています。`;
+    el.innerHTML=`この診断結果を見た <strong>${FB_BASE.total.toLocaleString()}</strong> 人中、<strong>${FB_BASE.hit.toLocaleString()}</strong> 人（<strong>${pct}%</strong>）が「当たっている」と回答しています。`;
   }
 }
 
@@ -1156,14 +1156,8 @@ async function submitHit(){
   const typeKey=window.R?.type||'unknown';
   if(btns) btns.style.display='none';
   try{
-    // upsert: hit_countをインクリメント
-    await sbFetch(`/rest/v1/feedback_stats`, "POST", {
-      type_key: typeKey, hit_count: 1, miss_count: 0
-    }).catch(async ()=>{
-      // 既存レコードがある場合はRPCでインクリメント
-      await sbFetch(`/rest/v1/rpc/increment_hit`, "POST", {p_type_key: typeKey});
-    });
-  }catch(e){ console.error(e); }
+    await sbFetch(`/rest/v1/rpc/increment_hit`, "POST", {p_type_key: typeKey});
+  }catch(e){ /* サイレント */ }
   await loadFeedbackStats(typeKey);
   if(done){
     done.style.display='block';
