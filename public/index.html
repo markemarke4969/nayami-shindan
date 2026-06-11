@@ -753,14 +753,14 @@ function renderStart(app){
       <div class="profile-title">はじめに少し教えてください</div>
       <div class="profile-sub">より精度の高い診断のために使用します。</div>
       <div class="form-row"><label class="form-label">お名前（漢字フルネーム）</label><input class="form-input" type="text" id="nameInput" placeholder="例：山田太郎" value="${profile.name}"></div>
-      <div class="form-row"><label class="form-label">生年月日</label><input class="form-input" type="date" id="birthInput" value="${profile.birth}" max="${new Date().toISOString().split('T')[0]}"></div>
+      <div class="form-row"><label class="form-label">生年月日</label><input class="form-input" type="text" id="birthInput" placeholder="例：1990/06/11" value="${profile.birth}" inputmode="numeric"></div>
       <div class="form-row"><label class="form-label">血液型</label><div class="blood-grid">${['A','B','O','AB'].map(t=>`<button class="btn-blood${profile.blood===t?' selected':''}" onclick="selectBlood('${t}')">${t}型</button>`).join('')}</div></div>
     </div>
     <button class="btn-start" onclick="startDiagnosis()">診断スタート</button>
     <div id="start-err"></div>
   </div>`;
   document.getElementById('nameInput').addEventListener('input',e=>profile.name=e.target.value.trim());
-  const bi=document.getElementById('birthInput'); bi.addEventListener('change',e=>profile.birth=e.target.value); bi.addEventListener('input',e=>profile.birth=e.target.value);
+  document.getElementById('birthInput').addEventListener('input',e=>{ profile.birth=e.target.value.replace(/\//g,'-'); });
 }
 
 function selectBlood(t){
@@ -897,7 +897,6 @@ function renderResult(app){
 function startDiagnosis(){
   profile.name=document.getElementById('nameInput')?.value?.trim()||profile.name;
   const rawBirth = document.getElementById('birthInput')?.value?.trim()||'';
-  // Safari: 1990/06/11 → 1990-06-11 に正規化
   profile.birth = rawBirth.replace(/\//g, '-') || profile.birth;
   const err=document.getElementById('start-err');
   if(!profile.name){err.innerHTML='<div class="err-msg">お名前を入力してください</div>';return;}
