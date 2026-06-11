@@ -1113,18 +1113,24 @@ async function finalize(){
   // AIには「理論別の回答ログ」だけを渡す。占術は一切渡さない。
   const ansLog = answers.map((a,i)=>(i+1)+'. '+a.q+' => '+a.a).join('\n');
 
-  const systemPrompt = 'JSONのみ返す。前置き不要。コードブロック禁止。日本語OK。';
+  const systemPrompt = 'あなたは行動経済学と占術に精通した診断士。JSONのみ返す。前置き・コードブロック禁止。';
 
   const occultSummary = [zodiacData,etoData,gokyoData,kyuseiData,lpData,btData]
     .map(d=>d.moneyTrait||'').filter(Boolean).join(' / ');
 
-  const userPrompt = profile.name + 'の診断。タイプ:' + td.name + '。' +
-    '生まれ特性:' + occultSummary + '。' +
-    '長所:' + (td.strengths||[]).join(',') + '。' +
-    '短所:' + (td.weaknesses||[]).join(',') + '。' +
-    '回答:' + answers.map((a,i)=>(i+1)+'.'+a.q.slice(0,15)+'->'+a.a.slice(0,15)).join(' ') + '。' +
-    '以下のJSONを返せ(他は一切書くな):' +
-    '{"desc":"2~3文の診断","hook":"~のとき~しませんか形式","secret":"誰にも言えない本音","evidence":"根拠1行","blind_spot":"思い込み指摘","strengths_weaknesses":"長所短所の掛け合わせ2文","money_scene":"具体的な場面1~2文","contradictions":[{"point":"矛盾1","term":"用語","termDesc":"説明"},{"point":"矛盾2","term":"用語","termDesc":"説明"}]}';
+  const ansShort = answers.map((a,i)=>(i+1)+'.'+a.a).join(' | ');
+
+  const userPrompt = [
+    profile.name + 'さんの診断。タイプ:' + td.name + '(' + td.tagline + ')',
+    '生まれ持った特性:' + occultSummary,
+    'タイプ長所:' + (td.strengths||[]).join(','),
+    'タイプ短所:' + (td.weaknesses||[]).join(','),
+    'お金グセ典型例:' + (td.money_scene||''),
+    '回答サマリ:' + ansShort,
+    '',
+    '以下のJSONのみ返せ(余計な文字一切不要):',
+    '{"desc":"診断文2~3文。回答と生まれ持った特性を踏まえ心理の根っこを言い当てる。占術名不使用。でも、それは変えられます。で締める","hook":"~のとき~してしまいませんか形式の1文","secret":"誰にも言えない本音1~2文","evidence":"根拠1行","blind_spot":"お金の思い込み指摘1~2文","strengths_weaknesses":"タイプx占術の掛け合わせで長所短所2~3文","money_scene":"この人が実際にやりそうな具体的場面1~2文","contradictions":[{"point":"具体的な矛盾の指摘","term":"心理学用語","termDesc":"中学生向け説明"},{"point":"具体的な矛盾の指摘2","term":"心理学用語","termDesc":"説明"}]}'
+  ].join('\n');
 
   try{
     const safeBody = JSON.stringify({
